@@ -1,0 +1,38 @@
+# Terraform state files – never commit real state
+*.tfstate
+*.tfstate.*
+*.tfstate.backup
+
+# Terraform plan files
+*.tfplan
+*.plan
+
+# Terraform lock directory
+.terraform/
+.terraform.lock.hcl
+
+# Variable files that may contain secrets
+*.tfvars.json
+# Keep *.tfvars tracked for non-secret defaults,
+# but ignore any override files
+*.auto.tfvars
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Crash log files
+crash.log
+crash.*.log
+
+# Ignore CLI configuration files
+.terraformrc
+terraform.rc
+
+# Editor / OS artefacts
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
