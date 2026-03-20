@@ -24,20 +24,20 @@ output "assets_bucket_id" {
 
 output "iam_lab_user_arn" {
   description = "ARN of IAM lab user (null when IAM lab is disabled)."
-  value       = var.enable_iam_lab ? aws_iam_user.iam_lab_user[0].arn : null
+  value       = module.iam_lab.user_arn
 }
 
 output "iam_lab_policy_arn" {
   description = "ARN of IAM lab S3 read-only policy (null when IAM lab is disabled)."
-  value       = var.enable_iam_lab ? aws_iam_policy.iam_lab_s3_read[0].arn : null
+  value       = module.iam_lab.policy_arn
 }
 
 output "iam_lab_ec2_role_arn" {
   description = "ARN of IAM lab EC2-assumable role (null when IAM lab is disabled)."
-  value       = var.enable_iam_lab ? aws_iam_role.iam_lab_ec2_role[0].arn : null
+  value       = module.iam_lab.ec2_role_arn
 }
 
 output "iam_lab_ec2_instance_profile_name" {
   description = "Name of IAM lab EC2 instance profile (null when IAM lab is disabled)."
-  value       = var.enable_iam_lab ? aws_iam_instance_profile.iam_lab_ec2_profile[0].name : null
+  value       = module.iam_lab.ec2_instance_profile_name
 }
