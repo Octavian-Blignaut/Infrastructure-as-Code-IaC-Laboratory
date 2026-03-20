@@ -106,89 +106,18 @@ module "storage_assets" {
 # ──────────────────────────────────────────────────────────────────────────────
 # IAM Lab (opt-in)
 #
-# Safe experimentation surface for IAM in dev:
-# - Creates a test IAM user (no access keys generated).
-# - Grants least-privilege read access to the dev assets S3 bucket.
-# - Creates an EC2-assumable role with the same S3 read policy.
-#
-# Toggle with var.enable_iam_lab.
+# Split into dedicated module files:
+# - iam/policies.tf
+# - iam/roles.tf
+# - iam/bindings.tf
 # ──────────────────────────────────────────────────────────────────────────────
 
-data "aws_iam_policy_document" "iam_lab_s3_read" {
-  statement {
-    sid     = "AllowListBucket"
-    effect  = "Allow"
-    actions = ["s3:ListBucket"]
+module "iam_lab" {
+  source = "./iam"
 
-    resources = [
-      module.storage_assets.bucket_arn
-    ]
-  }
-
-  statement {
-    sid     = "AllowGetObjects"
-    effect  = "Allow"
-    actions = ["s3:GetObject"]
-
-    resources = [
-      "${module.storage_assets.bucket_arn}/*"
-    ]
-  }
-}
-
-resource "aws_iam_policy" "iam_lab_s3_read" {
-  count       = var.enable_iam_lab ? 1 : 0
-  name        = "${var.project}-${local.environment}-iam-lab-s3-read"
-  description = "IAM lab policy: read-only access to dev assets bucket"
-  policy      = data.aws_iam_policy_document.iam_lab_s3_read.json
-}
-
-resource "aws_iam_user" "iam_lab_user" {
-  count = var.enable_iam_lab ? 1 : 0
-  name  = var.iam_lab_user_name
-
-  tags = {
-    Purpose = "iam-lab"
-  }
-}
-
-resource "aws_iam_user_policy_attachment" "iam_lab_user_s3_read" {
-  count      = var.enable_iam_lab ? 1 : 0
-  user       = aws_iam_user.iam_lab_user[0].name
-  policy_arn = aws_iam_policy.iam_lab_s3_read[0].arn
-}
-
-data "aws_iam_policy_document" "iam_lab_ec2_assume_role" {
-  statement {
-    sid     = "AllowEC2AssumeRole"
-    effect  = "Allow"
-    actions = ["sts:AssumeRole"]
-
-    principals {
-      type        = "Service"
-      identifiers = ["ec2.amazonaws.com"]
-    }
-  }
-}
-
-resource "aws_iam_role" "iam_lab_ec2_role" {
-  count              = var.enable_iam_lab ? 1 : 0
-  name               = "${var.project}-${local.environment}-iam-lab-ec2-role"
-  assume_role_policy = data.aws_iam_policy_document.iam_lab_ec2_assume_role.json
-
-  tags = {
-    Purpose = "iam-lab"
-  }
-}
-
-resource "aws_iam_role_policy_attachment" "iam_lab_ec2_s3_read" {
-  count      = var.enable_iam_lab ? 1 : 0
-  role       = aws_iam_role.iam_lab_ec2_role[0].name
-  policy_arn = aws_iam_policy.iam_lab_s3_read[0].arn
-}
-
-resource "aws_iam_instance_profile" "iam_lab_ec2_profile" {
-  count = var.enable_iam_lab ? 1 : 0
-  name  = "${var.project}-${local.environment}-iam-lab-ec2-profile"
-  role  = aws_iam_role.iam_lab_ec2_role[0].name
+  project           = var.project
+  environment       = local.environment
+  enable_iam_lab    = var.enable_iam_lab
+  iam_lab_user_name = var.iam_lab_user_name
+  assets_bucket_arn = module.storage_assets.bucket_arn
 }
