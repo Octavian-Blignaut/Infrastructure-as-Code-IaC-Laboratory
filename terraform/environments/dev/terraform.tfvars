@@ -15,3 +15,7 @@ ami_id = "ami-0c02fb55956c7d316"
 # db_password is intentionally NOT set here.
 # Supply it via: export TF_VAR_db_password="<secret>"
 # or via your CI/CD secrets manager.
+
+# IAM lab (optional)
+# enable_iam_lab  = true
+# iam_lab_user_name = "iaclab-dev-iam-user"
