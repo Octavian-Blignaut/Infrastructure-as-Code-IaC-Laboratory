@@ -24,3 +24,15 @@ variable "db_password" {
   type        = string
   sensitive   = true
 }
+
+variable "enable_iam_lab" {
+  description = "Enable IAM lab resources (test user, policy, and EC2 role/profile) in dev."
+  type        = bool
+  default     = false
+}
+
+variable "iam_lab_user_name" {
+  description = "IAM username to create for experimentation when enable_iam_lab is true."
+  type        = string
+  default     = "iaclab-dev-iam-user"
+}
